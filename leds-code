@@ -1,0 +1,52 @@
+#include <WiFi.h>
+
+// Replace with your Wi-Fi credentials
+const char* ssid = "YOUR_SSID";
+const char* password = "YOUR_PASSWORD";
+
+// Define LED pins
+#define POWER_LED 2
+#define WIFI_LED  4
+
+void setup() {
+  Serial.begin(115200);
+
+  // Set LED pins as OUTPUT
+  pinMode(POWER_LED, OUTPUT);
+  pinMode(WIFI_LED, OUTPUT);
+
+  // Turn ON power LED at startup
+  digitalWrite(POWER_LED, HIGH);
+
+  // Start connecting to Wi-Fi
+  Serial.print("Connecting to WiFi: ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, password);
+
+  // Wait for connection
+  int retry = 0;
+  while (WiFi.status() != WL_CONNECTED && retry < 20) {
+    delay(500);
+    Serial.print(".");
+    retry++;
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\nWiFi connected!");
+    digitalWrite(WIFI_LED, HIGH); // Turn ON Wi-Fi LED
+  } else {
+    Serial.println("\nWiFi connection failed.");
+    digitalWrite(WIFI_LED, LOW);  // Turn OFF Wi-Fi LED
+  }
+}
+
+void loop() {
+  // Recheck Wi-Fi connection every 5 seconds
+  if (WiFi.status() == WL_CONNECTED) {
+    digitalWrite(WIFI_LED, HIGH);  // Wi-Fi OK
+  } else {
+    digitalWrite(WIFI_LED, LOW);   // Wi-Fi lost
+  }
+
+  delay(5000);
+}

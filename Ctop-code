@@ -1,0 +1,61 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+
+// Wi-Fi credentials
+const char* ssid = "YOUR_SSID";
+const char* password = "YOUR_PASSWORD";
+
+// CTOP endpoint and token
+const char* serverName = "https://your-ctop-endpoint.com/data";  // Replace with actual CTOP URL
+String bearerToken = "YOUR_BEARER_TOKEN";                        // Replace with your token
+
+void setup() {
+  Serial.begin(115200);
+  WiFi.begin(ssid, password);
+
+  Serial.print("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConnected to WiFi");
+}
+
+void loop() {
+  if (WiFi.status() == WL_CONNECTED) {
+    // Create dummy JSON payload
+    StaticJsonDocument<200> doc;
+    doc["temperature"] = 28.7;
+    doc["humidity"] = 55.2;
+    doc["pm25"] = 12.3;
+    doc["pm10"] = 18.5;
+    doc["sound"] = 0.82;
+
+    String jsonPayload;
+    serializeJson(doc, jsonPayload);
+
+    HTTPClient http;
+    http.begin(serverName);
+    http.addHeader("Content-Type", "application/json");
+    http.addHeader("Authorization", "Bearer " + bearerToken);
+
+    int httpResponseCode = http.POST(jsonPayload);
+
+    Serial.print("HTTP Response code: ");
+    Serial.println(httpResponseCode);
+
+    if (httpResponseCode > 0) {
+      String response = http.getString();
+      Serial.println("Response: " + response);
+    } else {
+      Serial.println("Failed to send POST");
+    }
+
+    http.end();
+  } else {
+    Serial.println("WiFi not connected!");
+  }
+
+  delay(5000); // Wait 5 seconds before next push
+}

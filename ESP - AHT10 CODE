@@ -1,0 +1,32 @@
+## 📚 Required Library:
+//* `Adafruit AHTX0` by Adafruit
+
+//  ➤ Install via **Library Manager** → Search **"Adafruit AHTX0"**
+// ========== AHT10 Temperature and Humidity Sensor ==========
+// Uses I2C interface
+// SDA -> GPIO21
+// SCL -> GPIO22
+
+#include <Wire.h>
+#include "Adafruit_AHTX0.h"
+Adafruit_AHTX0 aht;  // Create AHT10 sensor object
+void setup() {
+  Serial.begin(115200);
+  Wire.begin(21, 22);  // Set custom I2C pins on ESP32
+  if (!aht.begin()) {
+    Serial.println("Could not find AHT10 sensor. Check wiring!");
+    while (1);  // Stop if sensor not found
+  }
+  Serial.println("AHT10 Sensor Initialized Successfully.");
+}
+void loop() {
+  sensors_event_t humidity, temperature;
+  aht.getEvent(&humidity, &temperature);  // Read sensor values
+  Serial.print("Temperature: ");
+  Serial.print(temperature.temperature);
+  Serial.print(" °C | Humidity: ");
+  Serial.print(humidity.relative_humidity);
+  Serial.println(" %");
+
+  delay(2000);  // Read every 2 seconds
+}

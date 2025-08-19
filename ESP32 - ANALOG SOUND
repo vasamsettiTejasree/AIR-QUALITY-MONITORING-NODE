@@ -1,0 +1,25 @@
+
+// ========== Analog Sound Sensor ==========
+// Measures sound level in analog voltage
+// OUT (sensor) -> GPIO36 (ESP32 analog input)
+
+#define SoundSensorPin 36    // Analog pin
+#define VREF 3.3             // ESP32 analog reference voltage (3.3V)
+
+void setup() 
+  Serial.begin(115200);
+  pinMode(SoundSensorPin, INPUT);
+  analogReadResolution(12);  // Set resolution to 12-bit (0-4095)
+}
+
+void loop() {
+  // Read analog value and convert to voltage
+  float voltage = analogRead(SoundSensorPin) / 4095.0 * VREF;
+
+  // Approximate conversion to dBA (basic scaling, not calibrated)
+  float dB = voltage * 50.0;
+  Serial.print("Sound Level: ");
+  Serial.print(dB);
+  Serial.println(" dBA");
+  delay(1000);  // Read every 1 second
+}

@@ -1,0 +1,48 @@
+#include <WiFi.h>
+
+// Replace with your Wi-Fi credentials
+const char* ssid = "YOUR_SSID";
+const char* password = "YOUR_PASSWORD";
+
+// Function to connect to Wi-Fi
+void connectToWiFi() {
+  Serial.print("Connecting to WiFi: ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+
+  // Wait until connected
+  int retry_count = 0;
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+    retry_count++;
+
+    // Timeout after 20 attempts (10 seconds)
+    if (retry_count > 20) {
+      Serial.println("\nFailed to connect. Restarting...");
+      ESP.restart(); // Optional: Restart the board
+    }
+  }
+
+  Serial.println("\nConnected to WiFi!");
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void setup() {
+  Serial.begin(115200); // Start Serial Monitor
+  connectToWiFi();      // Initial Wi-Fi connection
+}
+
+void loop() {
+  // Check Wi-Fi connection every 5 seconds
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("WiFi disconnected! Reconnecting...");
+    connectToWiFi();
+  } else {
+    Serial.println("WiFi connected");
+  }
+
+  delay(5000); // Wait 5 seconds before checking again
+}

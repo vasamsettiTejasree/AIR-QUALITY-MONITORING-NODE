@@ -1,0 +1,39 @@
+### 📚 Required Library:
+
+//* `SDS011` by R. Zschiegner
+ // ➤ Install via **Arduino IDE** → **Library Manager** → Search **"SDS011"**
+// ========== SDS011 Air Quality Sensor ==========
+// Measures PM2.5 and PM10 particulate matter
+// TX (from SDS011) -> GPIO16 (ESP32 RX)
+// RX (from SDS011) -> GPIO17 (ESP32 TX)
+
+#include <SoftwareSerial.h>
+#include <SDS011.h>
+
+SoftwareSerial sdsSerial(16, 17);  // RX, TX (ESP32)
+SDS011 my_sds;
+float pm25, pm10;
+int error;
+
+void setup() {
+  Serial.begin(115200);
+  sdsSerial.begin(9600);        // SDS011 default baudrate
+  my_sds.begin(16, 17);         // Start SDS011 on ESP32 pins
+  Serial.println("Starting SDS011 Sensor Test...");
+}
+void loop() {
+  // Read particulate matter values from SDS011
+  error = my_sds.read(&pm25, &pm10);
+  if (!error) {
+    Serial.print("PM2.5: ");
+    Serial.print(pm25);
+    Serial.print(" µg/m³ | PM10: ");
+    Serial.print(pm10);
+    Serial.println(" µg/m³");
+  } else {
+    Serial.println("Failed to read SDS011 sensor.");
+  }
+
+  delay(5000);  // Wait 5 seconds between readings
+}
+
